@@ -1,48 +1,30 @@
 package com.zjgsu.wzy.campuscourseselectionsystem.model;
 
-public class ApiResponse<T> {
-    private int code;
-    private String message;
-    private T data;
+import java.util.Map;
 
-    // 构造方法
-    public ApiResponse(int code, String message, T data) {
-        this.code = code;
+public class ApiResponse {
+
+    private boolean success;  // 请求是否成功
+    private Map<String, Object> message;   // 多个键值对，存储返回的信息
+
+    public ApiResponse(boolean success, Map<String, Object> message) {
+        this.success = success;
         this.message = message;
-        this.data = data;
     }
 
-    // 静态工厂方法，方便调用
-    public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(200, "Success", data);
+    public boolean isSuccess() {
+        return success;
     }
 
-    public static <T> ApiResponse<T> error(int code, String message) {
-        return new ApiResponse<>(code, message, null);
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
-    // Getter & Setter
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
+    public Map<String, Object> getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
+    public void setMessage(Map<String, Object> message) {
+        this.message= message;
     }
 }
