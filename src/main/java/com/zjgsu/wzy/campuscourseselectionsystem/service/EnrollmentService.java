@@ -1,7 +1,6 @@
 package com.zjgsu.wzy.campuscourseselectionsystem.service;
 
 
-import com.zjgsu.wzy.campuscourseselectionsystem.model.Course;
 import com.zjgsu.wzy.campuscourseselectionsystem.model.Enrollment;
 import com.zjgsu.wzy.campuscourseselectionsystem.repository.EnrollmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;

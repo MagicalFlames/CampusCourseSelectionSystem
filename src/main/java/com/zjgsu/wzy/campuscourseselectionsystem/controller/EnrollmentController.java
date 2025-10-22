@@ -1,21 +1,20 @@
 package com.zjgsu.wzy.campuscourseselectionsystem.controller;
 
 
+import com.zjgsu.wzy.campuscourseselectionsystem.model.ApiResponse;
 import com.zjgsu.wzy.campuscourseselectionsystem.model.Enrollment;
-import com.zjgsu.wzy.campuscourseselectionsystem.repository.EnrollmentRepository;
 import com.zjgsu.wzy.campuscourseselectionsystem.service.EnrollmentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/enrollments")
 public class EnrollmentController {
-    private EnrollmentService enrollmentService;
+    private final EnrollmentService enrollmentService;
 
     @Autowired
     public EnrollmentController(EnrollmentService enrollmentService) {
@@ -23,30 +22,43 @@ public class EnrollmentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> dropCourse(@PathVariable String id) {
+    public ApiResponse dropCourse(@PathVariable String id) {
         if(enrollmentService.delete(id)) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ApiResponse(true, Map.of(
+               "ok","删除成功"
+            ));
         }
         else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ApiResponse(false, Map.of(
+                    "error","记录不存在"
+            ));
         }
     }
 
     @GetMapping
-    public ResponseEntity<List<Enrollment>> getAllEnrollments() {
+    public ApiResponse getAllEnrollments() {
         List<Enrollment> enrollments = enrollmentService.findAll();
-        return ResponseEntity.ok(enrollments);
+        return new ApiResponse(true, Map.of(
+                "ok","获取成功",
+                "data", enrollments
+        ));
     }
 
     @GetMapping("/course/{courseId}")
-    public ResponseEntity<Optional<Enrollment>> getEnrollmentsByCourse(@PathVariable String courseId) {
+    public ApiResponse getEnrollmentsByCourse(@PathVariable String courseId) {
         Optional<Enrollment> enrollments = enrollmentService.findByCourseId(courseId);
-        return ResponseEntity.ok(enrollments);
+        return new ApiResponse(true, Map.of(
+                "ok","获取成功",
+                "data", enrollments
+        ));
     }
 
     @GetMapping("/student/{studentId}")
-    public ResponseEntity<List<Enrollment>> getEnrollmentsByStudent(@PathVariable String studentId) {
+    public ApiResponse getEnrollmentsByStudent(@PathVariable String studentId) {
         List<Enrollment> enrollments = enrollmentService.findByStudentId(studentId);
-        return ResponseEntity.ok(enrollments);
+        return new ApiResponse(true, Map.of(
+                "ok","查询成功",
+                "data", enrollments
+        ));
     }
 }
