@@ -22,10 +22,17 @@ public class StudentController {
 
     @PostMapping
     public ApiResponse createStudent(@RequestBody Student student) {
-        studentService.create(student);
-        return new ApiResponse(true, Map.of(
-                "ok","创建成功"
-        ));
+        try {
+            Student savedStudent = studentService.create(student);
+            return new ApiResponse(true, Map.of(
+                    "ok", "创建成功",
+                    "data", savedStudent
+            ));
+        } catch (IllegalArgumentException e) {
+            return new ApiResponse(false, Map.of(
+                    "error", e.getMessage()
+            ));
+        }
     }
 
     @GetMapping
@@ -49,18 +56,35 @@ public class StudentController {
 
     @PutMapping("/{id}")
     public ApiResponse updateStudent(@PathVariable String id, @RequestBody Student updatedStudent) {
-        updatedStudent.setId(id);
-        studentService.update(updatedStudent);
-        return new ApiResponse(true, Map.of(
-                "ok","学生信息更新成功"
-        ));
+        try {
+            Student student = studentService.update(id, updatedStudent);
+            return new ApiResponse(true, Map.of(
+                    "ok", "学生信息更新成功",
+                    "data", student
+            ));
+        } catch (IllegalArgumentException e) {
+            return new ApiResponse(false, Map.of(
+                    "error", e.getMessage()
+            ));
+        }
     }
 
     @DeleteMapping("/{id}")
     public ApiResponse deleteStudent(@PathVariable String id) {
-        studentService.delete(id);
-        return new ApiResponse(true, Map.of(
-                "ok","学生删除成功"
-        ));
+        try {
+            if (studentService.delete(id)) {
+                return new ApiResponse(true, Map.of(
+                        "ok", "学生删除成功"
+                ));
+            } else {
+                return new ApiResponse(false, Map.of(
+                        "error", "学生不存在"
+                ));
+            }
+        } catch (IllegalStateException e) {
+            return new ApiResponse(false, Map.of(
+                    "error", e.getMessage()
+            ));
+        }
     }
 }

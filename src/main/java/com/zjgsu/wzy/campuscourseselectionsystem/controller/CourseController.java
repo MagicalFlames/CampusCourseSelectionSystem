@@ -48,26 +48,50 @@ public class CourseController {
 
     @PostMapping
     public ApiResponse addCourse(@RequestBody Course course) {
-        courseService.add(course);
-        return new ApiResponse(true,Map.of(
-               "ok","课程添加成功"
-        ));
+        try {
+            Course savedCourse = courseService.add(course);
+            return new ApiResponse(true, Map.of(
+                    "ok", "课程添加成功",
+                    "data", savedCourse
+            ));
+        } catch (IllegalArgumentException e) {
+            return new ApiResponse(false, Map.of(
+                    "error", e.getMessage()
+            ));
+        }
     }
 
     @PutMapping("/{courseId}")
     public ApiResponse updateCourse(@PathVariable String courseId, @RequestBody Course updatedCourse) {
-        updatedCourse.setId(courseId);
-        courseService.update(updatedCourse);
-        return new ApiResponse(true,Map.of(
-                "ok","课程更新成功"
-        ));
+        try {
+            Course course = courseService.update(courseId, updatedCourse);
+            return new ApiResponse(true, Map.of(
+                    "ok", "课程更新成功",
+                    "data", course
+            ));
+        } catch (IllegalArgumentException e) {
+            return new ApiResponse(false, Map.of(
+                    "error", e.getMessage()
+            ));
+        }
     }
 
     @DeleteMapping("/{courseId}")
     public ApiResponse deleteCourse(@PathVariable String courseId) {
-        courseService.delete(courseId);
-        return new ApiResponse(true,Map.of(
-                "ok","课程删除成功"
-        ));
+        try {
+            if (courseService.delete(courseId)) {
+                return new ApiResponse(true, Map.of(
+                        "ok", "课程删除成功"
+                ));
+            } else {
+                return new ApiResponse(false, Map.of(
+                        "error", "课程不存在"
+                ));
+            }
+        } catch (IllegalStateException e) {
+            return new ApiResponse(false, Map.of(
+                    "error", e.getMessage()
+            ));
+        }
     }
 }

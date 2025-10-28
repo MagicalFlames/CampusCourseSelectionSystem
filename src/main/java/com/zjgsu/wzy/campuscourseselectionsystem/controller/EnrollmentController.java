@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/enrollments")
@@ -21,16 +20,52 @@ public class EnrollmentController {
         this.enrollmentService = enrollmentService;
     }
 
-    @DeleteMapping("/{id}")
-    public ApiResponse dropCourse(@PathVariable String id) {
-        if(enrollmentService.delete(id)) {
+    /**
+     * 学生选课
+     */
+
+    @PostMapping
+    public ApiResponse enroll(@RequestBody Map<String, String> request) {
+        try {
+            String studentId = request.get("studentId");
+            String courseId = request.get("courseId");
+
+            if (studentId == null || courseId == null) {
+                return new ApiResponse(false, Map.of(
+                        "error", "studentId 和 courseId 不能为空"
+                ));
+            }
+
+            Enrollment enrollment = enrollmentService.enroll(studentId, courseId);
             return new ApiResponse(true, Map.of(
-               "ok","删除成功"
+                    "ok", "选课成功",
+                    "data", enrollment
+            ));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return new ApiResponse(false, Map.of(
+                    "error", e.getMessage()
             ));
         }
-        else{
+    }
+
+    /**
+     * 退课
+     */
+    @DeleteMapping("/{id}")
+    public ApiResponse dropCourse(@PathVariable String id) {
+        try {
+            if (enrollmentService.drop(id)) {
+                return new ApiResponse(true, Map.of(
+                        "ok", "退课成功"
+                ));
+            } else {
+                return new ApiResponse(false, Map.of(
+                        "error", "选课记录不存在"
+                ));
+            }
+        } catch (IllegalStateException e) {
             return new ApiResponse(false, Map.of(
-                    "error","记录不存在"
+                    "error", e.getMessage()
             ));
         }
     }
@@ -46,7 +81,7 @@ public class EnrollmentController {
 
     @GetMapping("/course/{courseId}")
     public ApiResponse getEnrollmentsByCourse(@PathVariable String courseId) {
-        Optional<Enrollment> enrollments = enrollmentService.findByCourseId(courseId);
+        List<Enrollment> enrollments = enrollmentService.findByCourseId(courseId);
         return new ApiResponse(true, Map.of(
                 "ok","获取成功",
                 "data", enrollments
