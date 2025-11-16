@@ -1,0 +1,67 @@
+# Build outputs
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Version control
+.git/
+.gitignore
+
+# Documentation
+*.md
+README*
+LICENSE
+docs/
+
+# IDE files
+.idea/
+.vscode/
+.eclipse/
+*.iml
+*.ipr
+*.iws
+.settings/
+.project
+.classpath
+
+# Maven wrapper (we'll use the one in the image)
+.mvn/
+mvnw
+mvnw.cmd
+
+# Database files (we'll use fresh DB in container)
+data/
+*.db
+*.mv.db
+*.trace.db
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Test outputs
+test-output/
+.pytest_cache/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Docker files (no need to copy Dockerfile into image)
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# PDF and zone identifier files
+*.pdf
+*.pdf:Zone.Identifier

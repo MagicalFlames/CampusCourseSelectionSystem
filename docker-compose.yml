@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库服务
+  mysql:
+    image: mysql:8
+    container_name: coursehub-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: coursehub
+      MYSQL_USER: courseuser
+      MYSQL_PASSWORD: coursepassword
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - coursehub-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # 应用服务
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: coursehub-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # 启用 Docker 专用配置文件
+      SPRING_PROFILES_ACTIVE: docker
+      # 数据库连接配置（可选，如需覆盖 application-docker.yml 中的默认值）
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/coursehub?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: courseuser
+      SPRING_DATASOURCE_PASSWORD: coursepassword
+      # JPA 配置（可选）
+      SPRING_JPA_SHOW_SQL: "true"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - coursehub-network
+
+# 网络配置
+networks:
+  coursehub-network:
+    driver: bridge
+    name: coursehub-network
+
+# 数据卷配置
+volumes:
+  mysql-data:
+    name: coursehub-mysql-data
+    driver: local
